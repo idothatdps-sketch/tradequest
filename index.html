@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b12">
+  <title>TradeQuest — Trading lernen</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="app-shell">
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">TQ</div>
+        <div>
+          <strong>TradeQuest</strong>
+          <span>Trading lernen. Spielen. Besser werden.</span>
+        </div>
+      </div>
+
+      <div class="simulation-badge">
+        <span></span>
+        SIMULATION · KEIN ECHTES GELD
+      </div>
+
+      <button class="icon-btn" id="resetBtn" title="Simulation zurücksetzen">↻</button>
+    </header>
+
+    <main id="app">
+
+      <!-- HOME -->
+      <section class="page active" id="page-home">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow">DEIN TRADING-KONTO</span>
+            <h1>Willkommen bei TradeQuest</h1>
+            <p>Lerne Trading durch eine realistische Simulation.</p>
+          </div>
+          <div class="level-card">
+            <div class="level-top">
+              <span>LEVEL <b id="levelNumber">1</b></span>
+              <span id="xpText">0 / 100 XP</span>
+            </div>
+            <div class="progress"><div id="xpBar"></div></div>
+          </div>
+        </div>
+
+        <div class="hero-grid">
+          <div class="balance-card">
+            <div class="card-label">GESAMTVERMÖGEN</div>
+            <div class="big-number" id="totalEquity">10.000,00 €</div>
+            <div class="change positive" id="totalChange">+0,00 € · +0,00 %</div>
+
+            <div class="balance-bottom">
+              <div>
+                <span>Cash</span>
+                <strong id="cashValue">10.000,00 €</strong>
+              </div>
+              <div>
+                <span>Investiert</span>
+                <strong id="investedValue">0,00 €</strong>
+              </div>
+              <div>
+                <span>Trades</span>
+                <strong id="tradeCount">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="quick-card">
+            <div class="card-title">
+              <span>Deine Mission</span>
+              <span class="mission-icon">⚡</span>
+            </div>
+            <h2 id="homeMissionTitle">Deinen ersten Trade durchführen</h2>
+            <p id="homeMissionText">Kaufe ein Asset mit virtuellem Geld.</p>
+            <button class="primary-btn" data-page="trade">Mission starten →</button>
+          </div>
+        </div>
+
+        <div class="section-title">
+          <div>
+            <span class="eyebrow">MARKTÜBERSICHT</span>
+            <h2>Was passiert gerade?</h2>
+          </div>
+          <button class="text-btn" data-page="markets">Alle Märkte →</button>
+        </div>
+
+        <div class="market-grid" id="homeMarkets"></div>
+
+        <div class="section-title">
+          <div>
+            <span class="eyebrow">LERNFORTSCHRITT</span>
+            <h2>Trading Academy</h2>
+          </div>
+          <button class="text-btn" data-page="learn">Weiterlernen →</button>
+        </div>
+
+        <div class="learning-card">
+          <div class="learning-icon">🎓</div>
+          <div class="learning-info">
+            <strong id="homeLessonTitle">Trading-Grundlagen</strong>
+            <span id="homeLessonProgress">0 % abgeschlossen</span>
+            <div class="progress"><div id="homeLearnBar"></div></div>
+          </div>
+          <button class="secondary-btn" data-page="learn">Lernen</button>
+        </div>
+      </section>
+
+      <!-- MARKETS -->
+      <section class="page" id="page-markets">
+        <div class="page-heading compact">
+          <div>
+            <span class="eyebrow">MARKETS</span>
+            <h1>Märkte</h1>
+            <p>Beobachte simulierte Marktbewegungen in Echtzeit.</p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box">
+            <span>⌕</span>
+            <input id="marketSearch" placeholder="Asset suchen...">
+          </div>
+          <div class="filter-tabs">
+            <button class="filter active" data-filter="all">Alle</button>
+            <button class="filter" data-filter="crypto">Crypto</button>
+            <button class="filter" data-filter="stocks">Aktien</button>
+            <button class="filter" data-filter="etf">ETF</button>
+          </div>
+        </div>
+
+        <div class="markets-table-wrap">
+          <table class="markets-table">
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Preis</th>
+                <th>24h</th>
+                <th>Aktion</th>
+              </tr>
+            </thead>
+            <tbody id="marketsTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TRADE -->
+      <section class="page" id="page-trade">
+        <div class="page-heading compact">
+          <div>
+            <span class="eyebrow">TRADING TERMINAL</span>
+            <h1>Trade</h1>
+            <p>Übe Trading mit virtuellem Kapital.</p>
+          </div>
+        </div>
+
+        <div class="trade-layout">
+
+          <div class="chart-panel">
+            <div class="chart-header">
+              <div class="asset-select">
+                <select id="tradeAsset"></select>
+                <div>
+                  <strong id="tradeAssetName">Bitcoin</strong>
+                  <span id="tradeAssetSymbol">BTC</span>
+                </div>
+              </div>
+
+              <div class="chart-price">
+                <strong id="chartPrice">0,00 €</strong>
+                <span id="chartChange">+0,00 %</span>
+              </div>
+            </div>
+
+            <div class="chart-controls">
+              <button class="chart-period active" data-period="1m">1M</button>
+              <button class="chart-period" data-period="5m">5M</button>
+              <button class="chart-period" data-period="15m">15M</button>
+              <button class="chart-period" data-period="1h">1H</button>
+              <button class="chart-period" data-period="4h">4H</button>
+              <button class="chart-period" data-period="1d">1D</button>
+            </div>
+
+            <div class="chart-container">
+              <canvas id="priceChart"></canvas>
+            </div>
+
+            <div class="chart-footer">
+              <span>● Simulierter Markt</span>
+              <span id="lastUpdate">Update: gerade eben</span>
+            </div>
+          </div>
+
+          <div class="order-panel">
+
+            <div class="order-tabs">
+              <button class="order-side active buy" data-side="buy">KAUFEN</button>
+              <button class="order-side sell" data-side="sell">VERKAUFEN</button>
+            </div>
+
+            <div class="order-types">
+              <button class="order-type active" data-order="market">Market</button>
+              <button class="order-type" data-order="limit">Limit</button>
+              <button class="order-type" data-order="stop">Stop</button>
+            </div>
+
+            <div class="order-form">
+
+              <label>Asset</label>
+              <select id="orderAsset"></select>
+
+              <label>Menge</label>
+              <div class="input-wrap">
+                <input id="orderQuantity" type="number" min="0" step="any" placeholder="0.00">
+                <span id="quantitySymbol">BTC</span>
+              </div>
+
+              <div id="limitPriceRow" class="hidden">
+                <label>Limit-Preis</label>
+                <div class="input-wrap">
+                  <input id="limitPrice" type="number" min="0" step="any">
+                  <span>€</span>
+                </div>
+              </div>
+
+              <div class="quick-percent">
+                <button data-percent="25">25%</button>
+                <button data-percent="50">50%</button>
+                <button data-percent="75">75%</button>
+                <button data-percent="100">MAX</button>
+              </div>
+
+              <div class="risk-options">
+                <div>
+                  <label>Stop Loss</label>
+                  <input id="stopLoss" type="number" placeholder="Optional">
+                </div>
+                <div>
+                  <label>Take Profit</label>
+                  <input id="takeProfit" type="number" placeholder="Optional">
+                </div>
+              </div>
+
+              <div class="order-summary">
+                <div><span>Preis</span><strong id="orderPrice">0,00 €</strong></div>
+                <div><span>Menge</span><strong id="orderAmount">0</strong></div>
+                <div><span>Gebühr</span><strong id="orderFee">0,00 €</strong></div>
+                <div class="summary-total"><span>Gesamt</span><strong id="orderTotal">0,00 €</strong></div>
+              </div>
+
+              <button class="trade-btn buy" id="executeOrder">Bitcoin kaufen</button>
+
+              <small class="simulation-note">
+                Diese Order verwendet ausschließlich virtuelles Geld.
+              </small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LEARN -->
+      <section class="page" id="page-learn">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow">TRADING ACADEMY</span>
+            <h1>Lernen</h1>
+            <p>Vom Anfänger zum sicheren Trader.</p>
+          </div>
+          <div class="academy-xp">⭐ <b id="academyXP">0</b> XP</div>
+        </div>
+
+        <div class="course-grid" id="courseGrid"></div>
+      </section>
+
+      <!-- PORTFOLIO -->
+      <section class="page" id="page-portfolio">
+        <div class="page-heading compact">
+          <div>
+            <span class="eyebrow">DEIN PORTFOLIO</span>
+            <h1>Portfolio</h1>
+            <p>Verwalte deine virtuellen Positionen.</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span>Gesamtvermögen</span>
+            <strong id="portfolioEquity">10.000,00 €</strong>
+          </div>
+          <div class="stat-card">
+            <span>Cash</span>
+            <strong id="portfolioCash">10.000,00 €</strong>
+          </div>
+          <div class="stat-card">
+            <span>Realisiert P&L</span>
+            <strong id="realizedPnL">0,00 €</strong>
+          </div>
+          <div class="stat-card">
+            <span>Unrealisiert P&L</span>
+            <strong id="unrealizedPnL">0,00 €</strong>
+          </div>
+        </div>
+
+        <div class="portfolio-section">
+          <div class="section-title">
+            <h2>Offene Positionen</h2>
+          </div>
+          <div id="positionsList" class="positions-list"></div>
+        </div>
+
+        <div class="portfolio-section">
+          <div class="section-title">
+            <h2>Trade-Historie</h2>
+          </div>
+          <div class="history-wrap">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Datum</th>
+                  <th>Asset</th>
+                  <th>Typ</th>
+                  <th>Menge</th>
+                  <th>Preis</th>
+                  <th>Wert</th>
+                  <th>P&L</th>
+                </tr>
+              </thead>
+              <tbody id="tradeHistory"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- MISSIONS -->
+      <section class="page" id="page-missions">
+        <div class="page-heading compact">
+          <div>
+            <span class="eyebrow">QUESTS</span>
+            <h1>Missionen</h1>
+            <p>Lerne Trading durch praktische Aufgaben.</p>
+          </div>
+        </div>
+
+        <div class="mission-list" id="missionList"></div>
+
+        <div class="achievement-section">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">ACHIEVEMENTS</span>
+              <h2>Deine Auszeichnungen</h2>
+            </div>
+          </div>
+          <div class="achievement-grid" id="achievementGrid"></div>
+        </div>
+      </section>
+
+      <!-- JOURNAL -->
+      <section class="page" id="page-journal">
+        <div class="page-heading compact">
+          <div>
+            <span class="eyebrow">TRADING JOURNAL</span>
+            <h1>Journal</h1>
+            <p>Verstehe deine Entscheidungen und lerne aus deinen Trades.</p>
+          </div>
+        </div>
+
+        <div class="journal-form">
+          <h2>Neuer Journaleintrag</h2>
+
+          <label>Asset</label>
+          <select id="journalAsset"></select>
+
+          <label>Was war deine Idee?</label>
+          <textarea id="journalText" placeholder="Warum hast du diesen Trade gemacht?"></textarea>
+
+          <label>Emotion</label>
+          <select id="journalEmotion">
+            <option>Ruhig</option>
+            <option>Selbstbewusst</option>
+            <option>Unsicher</option>
+            <option>Gierig</option>
+            <option>Ängstlich</option>
+          </select>
+
+          <button class="primary-btn" id="saveJournal">Eintrag speichern</button>
+        </div>
+
+        <div class="journal-list" id="journalList"></div>
+      </section>
+
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-page="home">
+        <span>⌂</span><small>Home</small>
+      </button>
+      <button class="nav-item" data-page="markets">
+        <span>◈</span><small>Märkte</small>
+      </button>
+      <button class="nav-item trade-nav" data-page="trade">
+        <span>＋</span><small>Trade</small>
+      </button>
+      <button class="nav-item" data-page="learn">
+        <span>◇</span><small>Lernen</small>
+      </button>
+      <button class="nav-item" data-page="portfolio">
+        <span>▣</span><small>Portfolio</small>
+      </button>
+    </nav>
+
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <div class="modal hidden" id="lessonModal">
+    <div class="modal-card">
+      <button class="modal-close" id="closeLesson">×</button>
+      <div id="lessonContent"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
