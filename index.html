@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0e13">
+  <title>TradeQuest</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- HEADER -->
+    <header class="topbar">
+      <div>
+        <div class="brand">TRADE<span>QUEST</span></div>
+        <div class="demo-label">SIMULATION • KEIN ECHTGELD</div>
+      </div>
+
+      <div class="level-box">
+        <span>LVL</span>
+        <strong id="playerLevel">1</strong>
+      </div>
+    </header>
+
+
+    <!-- ================= HOME ================= -->
+
+    <main id="page-home" class="page active">
+
+      <section class="hero-card">
+        <div class="eyebrow">DEIN VIRTUELLES PORTFOLIO</div>
+
+        <div class="balance" id="homeBalance">
+          10.000,00 €
+        </div>
+
+        <div class="profit-line">
+          <span id="homeProfit">+0,00 €</span>
+          <span id="homeProfitPercent">+0,00 %</span>
+        </div>
+
+        <div class="xp-area">
+          <div class="xp-label">
+            <span>Level <b id="homeLevel">1</b></span>
+            <span><b id="homeXP">0</b> XP</span>
+          </div>
+
+          <div class="xp-bar">
+            <div id="homeXPBar"></div>
+          </div>
+        </div>
+      </section>
+
+
+      <section class="section">
+        <div class="section-title">
+          <h2>Marktübersicht</h2>
+          <button class="text-button" data-page="markets">Alle</button>
+        </div>
+
+        <div id="homeMarkets" class="market-grid"></div>
+      </section>
+
+
+      <section class="section">
+        <div class="section-title">
+          <h2>Deine Missionen</h2>
+          <button class="text-button" data-page="learn">Mehr</button>
+        </div>
+
+        <div id="homeMissions"></div>
+      </section>
+
+
+      <section class="section">
+        <div class="section-title">
+          <h2>Trading lernen</h2>
+        </div>
+
+        <div class="learn-banner" data-page="learn">
+          <div class="learn-icon">📚</div>
+
+          <div>
+            <strong>Starte deine Trading-Ausbildung</strong>
+            <p>Lerne Schritt für Schritt und sammle XP.</p>
+          </div>
+
+          <span>›</span>
+        </div>
+      </section>
+
+    </main>
+
+
+    <!-- ================= MARKETS ================= -->
+
+    <main id="page-markets" class="page">
+
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">MARKETS</span>
+          <h1>Märkte</h1>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <span>⌕</span>
+        <input id="marketSearch" type="text" placeholder="Asset suchen...">
+      </div>
+
+      <div class="filter-row">
+        <button class="filter active" data-filter="all">Alle</button>
+        <button class="filter" data-filter="crypto">Crypto</button>
+        <button class="filter" data-filter="stocks">Aktien</button>
+        <button class="filter" data-filter="etf">ETFs</button>
+        <button class="filter" data-filter="forex">Forex</button>
+        <button class="filter" data-filter="commodity">Rohstoffe</button>
+      </div>
+
+      <div id="marketList" class="market-list"></div>
+
+    </main>
+
+
+    <!-- ================= TRADE ================= -->
+
+    <main id="page-trade" class="page">
+
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">PAPER TRADING</span>
+          <h1>Trade</h1>
+        </div>
+      </div>
+
+      <section class="trade-asset-card">
+
+        <button id="tradeAssetSelector" class="asset-selector">
+          <span id="tradeAssetIcon" class="asset-big-icon">₿</span>
+
+          <span class="asset-info">
+            <strong id="selectedAsset">Bitcoin</strong>
+            <small id="selectedSymbol">BTC</small>
+          </span>
+
+          <span class="asset-current">
+            <strong id="selectedPrice">62.000,00 €</strong>
+            <small id="selectedChange">+0,00 %</small>
+          </span>
+        </button>
+
+        <div class="chart-wrapper">
+          <canvas id="tradingChart"></canvas>
+        </div>
+
+        <div class="chart-times">
+          <button class="time active">1M</button>
+          <button class="time">5M</button>
+          <button class="time">15M</button>
+          <button class="time">1H</button>
+          <button class="time">4H</button>
+          <button class="time">1D</button>
+          <button class="time">1W</button>
+        </div>
+
+      </section>
+
+
+      <section class="trade-panel">
+
+        <div class="trade-tabs">
+          <button class="trade-side active" data-side="buy">KAUFEN</button>
+          <button class="trade-side" data-side="sell">VERKAUFEN</button>
+        </div>
+
+        <div class="order-types">
+          <button class="order-type active" data-order="market">Market</button>
+          <button class="order-type" data-order="limit">Limit</button>
+          <button class="order-type" data-order="stop">Stop</button>
+        </div>
+
+        <div class="form-row">
+          <label>Menge</label>
+
+          <div class="input-wrap">
+            <input id="tradeQuantity" type="number" min="0" step="any" placeholder="0.00">
+            <span id="quantitySymbol">BTC</span>
+          </div>
+        </div>
+
+        <div id="triggerRow" class="form-row hidden">
+          <label>Trigger-Preis</label>
+
+          <div class="input-wrap">
+            <input id="tradePriceInput" type="number" min="0" step="any" placeholder="Preis">
+            <span>€</span>
+          </div>
+        </div>
+
+        <div class="trade-summary">
+          <div>
+            <span>Preis</span>
+            <strong id="tradePriceSummary">62.000,00 €</strong>
+          </div>
+
+          <div>
+            <span>Gebühr</span>
+            <strong id="tradeFee">0,00 €</strong>
+          </div>
+
+          <div>
+            <span>Verfügbar</span>
+            <strong id="tradeCash">10.000,00 €</strong>
+          </div>
+        </div>
+
+        <button id="executeTrade" class="primary-trade-button">
+          Bitcoin kaufen
+        </button>
+
+        <div class="risk-note">
+          ⚠️ Simulation: Alle Trades sind virtuell.
+        </div>
+
+      </section>
+
+
+      <section class="section">
+        <div class="section-title">
+          <h2>Offene Orders</h2>
+        </div>
+
+        <div id="ordersList" class="orders-list"></div>
+      </section>
+
+    </main>
+
+
+    <!-- ================= LEARN ================= -->
+
+    <main id="page-learn" class="page">
+
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">TRADEQUEST ACADEMY</span>
+          <h1>Lernen</h1>
+        </div>
+      </div>
+
+      <section class="academy-progress">
+        <div class="academy-level">
+          <div>
+            <span>Dein Fortschritt</span>
+            <strong>Level <b id="learnLevel">1</b></strong>
+          </div>
+
+          <div class="big-xp">
+            <b id="learnXP">0</b> XP
+          </div>
+        </div>
+
+        <div class="xp-bar">
+          <div id="learnXPBar"></div>
+        </div>
+      </section>
+
+      <div class="section-title">
+        <h2>Trading Academy</h2>
+      </div>
+
+      <div id="lessonList" class="lesson-list"></div>
+
+
+      <div class="section-title mission-heading">
+        <h2>Missionen</h2>
+      </div>
+
+      <div id="missionList"></div>
+
+    </main>
+
+
+    <!-- ================= PORTFOLIO ================= -->
+
+    <main id="page-portfolio" class="page">
+
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">DEIN KONTO</span>
+          <h1>Portfolio</h1>
+        </div>
+      </div>
+
+      <section class="portfolio-total">
+
+        <span>Gesamtvermögen</span>
+
+        <strong id="portfolioTotal">
+          10.000,00 €
+        </strong>
+
+        <div class="portfolio-profit">
+          <span id="portfolioProfit">+0,00 €</span>
+          <span id="portfolioPercent">+0,00 %</span>
+        </div>
+
+      </section>
+
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <span>Cash</span>
+          <strong id="portfolioCash">10.000,00 €</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Investiert</span>
+          <strong id="investedValue">0,00 €</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Trades</span>
+          <strong id="tradeCount">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>XP</span>
+          <strong id="portfolioXP">0</strong>
+        </div>
+
+      </div>
+
+
+      <section class="section">
+
+        <div class="section-title">
+          <h2>Positionen</h2>
+        </div>
+
+        <div id="positionsList"></div>
+
+      </section>
+
+
+      <section class="section">
+
+        <div class="section-title">
+          <h2>Trade-Historie</h2>
+        </div>
+
+        <div id="tradeHistory"></div>
+
+      </section>
+
+    </main>
+
+
+    <!-- ================= JOURNAL ================= -->
+
+    <main id="page-journal" class="page">
+
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">TRADING JOURNAL</span>
+          <h1>Journal</h1>
+        </div>
+      </div>
+
+      <section class="journal-compose">
+
+        <textarea
+          id="journalInput"
+          placeholder="Warum hast du diesen Trade gemacht? Was hast du gelernt?"
+        ></textarea>
+
+        <button id="saveJournal" class="primary-button">
+          Eintrag speichern
+        </button>
+
+      </section>
+
+      <div id="journalList"></div>
+
+    </main>
+
+
+    <!-- ================= PROFILE ================= -->
+
+    <main id="page-profile" class="page">
+
+      <div class="profile-header">
+
+        <div class="profile-avatar">
+          T
+        </div>
+
+        <h1>Trader</h1>
+
+        <span>Level <b id="profileLevel">1</b></span>
+
+      </div>
+
+
+      <section class="profile-card">
+
+        <div class="profile-row">
+          <span>XP</span>
+          <strong id="profileXP">0</strong>
+        </div>
+
+        <div class="profile-row">
+          <span>Trades</span>
+          <strong id="profileTrades">0</strong>
+        </div>
+
+        <div class="profile-row">
+          <span>Missionen</span>
+          <strong id="profileMissions">0</strong>
+        </div>
+
+      </section>
+
+
+      <section class="section">
+
+        <div class="section-title">
+          <h2>Achievements</h2>
+        </div>
+
+        <div id="achievements" class="achievements"></div>
+
+      </section>
+
+
+      <button id="resetApp" class="danger-button">
+        Simulation zurücksetzen
+      </button>
+
+    </main>
+
+
+    <!-- ================= BOTTOM NAV ================= -->
+
+    <nav class="bottom-nav">
+
+      <button data-page="home" class="nav-item active">
+        <span>⌂</span>
+        <small>Home</small>
+      </button>
+
+      <button data-page="markets" class="nav-item">
+        <span>◈</span>
+        <small>Märkte</small>
+      </button>
+
+      <button data-page="trade" class="nav-item trade-nav">
+        <span>↗</span>
+        <small>Trade</small>
+      </button>
+
+      <button data-page="learn" class="nav-item">
+        <span>▣</span>
+        <small>Lernen</small>
+      </button>
+
+      <button data-page="portfolio" class="nav-item">
+        <span>◉</span>
+        <small>Portfolio</small>
+      </button>
+
+    </nav>
+
+  </div>
+
+
+  <!-- TOAST -->
+
+  <div id="toast"></div>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
