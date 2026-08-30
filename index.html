@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeQuest</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">⚡ TradeQuest</div>
+  <div class="virtual">SIMULATION • €10.000</div>
+</header>
+<main>
+  <!-- HOME -->
+  <section id="home" class="page active">
+    <div class="hero">
+      <p class="eyebrow">TRADING ACADEMY</p>
+      <h1>Werde zum Trader.</h1>
+      <p>Lerne Trading und übe mit virtuellem Geld – ohne Risiko.</p>
+      <button onclick="showPage('learn')">🚀 Lernen starten</button>
+    </div>
+    <div class="stats">
+      <div class="card">
+        <span>Portfolio</span>
+        <strong id="homeBalance">€10.000,00</strong>
+      </div>
+      <div class="card">
+        <span>Gewinn / Verlust</span>
+        <strong id="homePnL">€0,00</strong>
+      </div>
+      <div class="card">
+        <span>Level</span>
+        <strong id="homeLevel">1</strong>
+      </div>
+      <div class="card">
+        <span>XP</span>
+        <strong id="homeXP">0</strong>
+      </div>
+    </div>
+    <div class="section-title">
+      <h2>Beliebte Märkte</h2>
+      <button class="small-btn" onclick="showPage('markets')">Alle ansehen</button>
+    </div>
+    <div id="homeMarkets" class="market-grid"></div>
+    <div class="section-title">
+      <h2>Dein Lernfortschritt</h2>
+    </div>
+    <div class="progress-card">
+      <div class="progress-info">
+        <span>Trading-Grundlagen</span>
+        <span id="lessonProgress">0%</span>
+      </div>
+      <div class="progress">
+        <div id="lessonBar"></div>
+      </div>
+    </div>
+  </section>
+  <!-- MARKETS -->
+  <section id="markets" class="page">
+    <div class="page-header">
+      <div>
+        <p class="eyebrow">MARKETS</p>
+        <h1>Märkte</h1>
+      </div>
+      <input id="searchInput" placeholder="🔎 Asset suchen..." oninput="renderMarkets()">
+    </div>
+    <div class="filters">
+      <button onclick="setFilter('all')">Alle</button>
+      <button onclick="setFilter('crypto')">Krypto</button>
+      <button onclick="setFilter('stocks')">Aktien</button>
+      <button onclick="setFilter('etf')">ETFs</button>
+      <button onclick="setFilter('forex')">Forex</button>
+      <button onclick="setFilter('commodity')">Rohstoffe</button>
+    </div>
+    <div id="marketsList" class="market-list"></div>
+  </section>
+  <!-- TRADE -->
+  <section id="trade" class="page">
+    <div class="trade-header">
+      <div>
+        <p class="eyebrow">SIMULATOR</p>
+        <h1>Trade</h1>
+      </div>
+      <select id="tradeAsset" onchange="updateTradePanel()"></select>
+    </div>
+    <div class="trade-layout">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <strong id="chartName">Bitcoin</strong>
+            <div id="chartPrice">€62.000,00</div>
+          </div>
+          <div class="timeframes">
+            <button onclick="setTimeframe('1M')">1M</button>
+            <button onclick="setTimeframe('5M')">5M</button>
+            <button onclick="setTimeframe('15M')">15M</button>
+            <button onclick="setTimeframe('1H')">1H</button>
+            <button onclick="setTimeframe('1D')">1D</button>
+          </div>
+        </div>
+        <canvas id="chart"></canvas>
+      </div>
+      <div class="order-card">
+        <div class="order-tabs">
+          <button id="buyTab" class="selected" onclick="setSide('buy')">KAUFEN</button>
+          <button id="sellTab" onclick="setSide('sell')">VERKAUFEN</button>
+        </div>
+        <label>Order-Typ</label>
+        <select id="orderType" onchange="updateOrderType()">
+          <option value="market">Market Order</option>
+          <option value="limit">Limit Order</option>
+          <option value="stop">Stop Loss</option>
+          <option value="takeprofit">Take Profit</option>
+        </select>
+        <label>Menge</label>
+        <input id="quantity" type="number" min="0" step="0.0001" placeholder="z.B. 0.01">
+        <div id="priceInputBox" class="hidden">
+          <label>Preis</label>
+          <input id="orderPrice" type="number" min="0" step="0.01">
+        </div>
+        <label class="check">
+          <input id="riskCheck" type="checkbox">
+          Risiko-Order verwenden
+        </label>
+        <button class="trade-btn" onclick="executeTrade()">
+          Trade ausführen
+        </button>
+        <p class="simulation-note">
+          ⚠️ Nur virtuelle Trades. Kein echtes Geld.
+        </p>
+        <div class="order-info">
+          <div><span>Preis</span><strong id="orderCurrentPrice">€0</strong></div>
+          <div><span>Gebühr</span><strong>0,10%</strong></div>
+          <div><span>Cash</span><strong id="orderCash">€10.000</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- PORTFOLIO -->
+  <section id="portfolio" class="page">
+    <div class="page-header">
+      <div>
+        <p class="eyebrow">PORTFOLIO</p>
+        <h1>Mein Portfolio</h1>
+      </div>
+    </div>
+    <div class="portfolio-total">
+      <span>Gesamtvermögen</span>
+      <strong id="portfolioBalance">€10.000,00</strong>
+      <small id="portfolioPnL">+€0,00</small>
+    </div>
+    <div class="stats">
+      <div class="card">
+        <span>Cash</span>
+        <strong id="portfolioCash">€10.000</strong>
+      </div>
+      <div class="card">
+        <span>Investiert</span>
+        <strong id="investedValue">€0</strong>
+      </div>
+      <div class="card">
+        <span>Trades</span>
+        <strong id="tradeCount">0</strong>
+      </div>
+    </div>
+    <h2>Positionen</h2>
+    <div id="positions" class="positions"></div>
+    <h2>Trade-Historie</h2>
+    <div id="history" class="history"></div>
+  </section>
+  <!-- LEARN -->
+  <section id="learn" class="page">
+    <div class="page-header">
+      <div>
+        <p class="eyebrow">TRADING ACADEMY</p>
+        <h1>Lernen</h1>
+        <p>Schalte Level frei und werde Schritt für Schritt besser.</p>
+      </div>
+    </div>
+    <div id="lessons" class="lesson-grid"></div>
+  </section>
+  <!-- MISSIONS -->
+  <section id="missions" class="page">
+    <div class="page-header">
+      <div>
+        <p class="eyebrow">QUESTS</p>
+        <h1>Missionen</h1>
+        <p>Erfülle Aufgaben und sammle XP.</p>
+      </div>
+    </div>
+    <div id="missionsList" class="mission-list"></div>
+    <h2>Achievements</h2>
+    <div id="achievements" class="achievement-grid"></div>
+  </section>
+  <!-- JOURNAL -->
+  <section id="journal" class="page">
+    <div class="page-header">
+      <div>
+        <p class="eyebrow">JOURNAL</p>
+        <h1>Trading-Journal</h1>
+      </div>
+    </div>
+    <textarea id="journalText" placeholder="Warum hast du deinen Trade gemacht? Was hast du gelernt?"></textarea>
+    <button onclick="saveJournal()">Eintrag speichern</button>
+    <div id="journalList" class="journal-list"></div>
+  </section>
+</main>
+<!-- NAVIGATION -->
+<nav class="bottom-nav">
+  <button onclick="showPage('home')" data-page="home">
+    <span>⌂</span>
+    Home
+  </button>
+  <button onclick="showPage('markets')" data-page="markets">
+    <span>◈</span>
+    Märkte
+  </button>
+  <button onclick="showPage('trade')" data-page="trade">
+    <span>↗</span>
+    Trade
+  </button>
+  <button onclick="showPage('learn')" data-page="learn">
+    <span>📚</span>
+    Lernen
+  </button>
+  <button onclick="showPage('portfolio')" data-page="portfolio">
+    <span>💼</span>
+    Portfolio
+  </button>
+</nav>
+<div id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
