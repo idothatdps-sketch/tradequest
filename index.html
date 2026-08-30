@@ -1,1 +1,723 @@
-m
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeQuest – Trading lernen</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #080b12;
+    color: white;
+}
+
+header {
+    padding: 20px;
+    background: #101522;
+    border-bottom: 1px solid #20283a;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.logo span {
+    color: #00d084;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 18px;
+}
+
+.balance {
+    background: linear-gradient(135deg,#101a2b,#111827);
+    border: 1px solid #26344d;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 18px;
+}
+
+.balance small {
+    color: #8d99ad;
+}
+
+.balance h1 {
+    margin: 7px 0;
+    font-size: 34px;
+}
+
+.xpbar {
+    height: 9px;
+    background: #20283a;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 12px;
+}
+
+.xpfill {
+    height: 100%;
+    width: 0%;
+    background: #00d084;
+}
+
+.assets {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.asset {
+    background: #101522;
+    border: 1px solid #20283a;
+    padding: 16px;
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+.asset.active {
+    border-color: #00d084;
+}
+
+.asset-name {
+    color: #8d99ad;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.change {
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+.green {
+    color: #00d084;
+}
+
+.red {
+    color: #ff5572;
+}
+
+.card {
+    background: #101522;
+    border: 1px solid #20283a;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+.chart {
+    width: 100%;
+    height: 300px;
+    background: #0b0f18;
+    border-radius: 14px;
+    padding: 10px;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.trade-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+input, select {
+    width: 100%;
+    padding: 13px;
+    margin-top: 7px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: 1px solid #29344a;
+    background: #080b12;
+    color: white;
+}
+
+button {
+    border: 0;
+    border-radius: 10px;
+    padding: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.buy {
+    width: 100%;
+    background: #00d084;
+    color: #04130d;
+}
+
+.sell {
+    width: 100%;
+    background: #ff5572;
+    color: white;
+}
+
+.portfolio-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #20283a;
+}
+
+.lesson {
+    padding: 15px;
+    background: #0b101b;
+    border-radius: 12px;
+    margin-top: 10px;
+}
+
+footer {
+    text-align: center;
+    color: #69758a;
+    padding: 30px;
+    font-size: 12px;
+}
+
+@media(max-width:700px) {
+    .assets {
+        grid-template-columns: 1fr;
+    }
+
+    .trade-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart {
+        height: 240px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Trade<span>Quest</span> 📈</div>
+</header>
+
+<div class="container">
+
+    <div class="balance">
+        <small>Spielkapital</small>
+        <h1 id="cash">1.000,00 €</h1>
+
+        <div>
+            <strong>Level <span id="level">1</span></strong>
+            · <span id="xp">0</span> XP
+        </div>
+
+        <div class="xpbar">
+            <div class="xpfill" id="xpFill"></div>
+        </div>
+    </div>
+
+    <div class="assets">
+
+        <div class="asset active" onclick="selectAsset('BTC')">
+            <div class="asset-name">Bitcoin</div>
+            <div class="price" id="BTCprice">Laden...</div>
+            <div class="change green">LIVE</div>
+        </div>
+
+        <div class="asset" onclick="selectAsset('ETH')">
+            <div class="asset-name">Ethereum</div>
+            <div class="price" id="ETHprice">Laden...</div>
+            <div class="change green">LIVE</div>
+        </div>
+
+        <div class="asset" onclick="selectAsset('SOL')">
+            <div class="asset-name">Solana</div>
+            <div class="price" id="SOLprice">Laden...</div>
+            <div class="change green">LIVE</div>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2 id="chartTitle">Bitcoin (BTC)</h2>
+
+        <div class="chart">
+            <canvas id="chart"></canvas>
+        </div>
+
+    </div>
+
+    <div class="trade-grid">
+
+        <div class="card">
+
+            <h2>Trade</h2>
+
+            <label>Coin</label>
+
+            <select id="coinSelect" onchange="selectAsset(this.value)">
+                <option value="BTC">Bitcoin (BTC)</option>
+                <option value="ETH">Ethereum (ETH)</option>
+                <option value="SOL">Solana (SOL)</option>
+            </select>
+
+            <label>Betrag in €</label>
+
+            <input
+                id="amount"
+                type="number"
+                min="1"
+                placeholder="z.B. 100"
+            >
+
+            <button class="buy" onclick="buy()">KAUFEN</button>
+
+            <br><br>
+
+            <button class="sell" onclick="sell()">VERKAUFEN</button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Dein Portfolio</h2>
+
+            <div class="portfolio-row">
+                <span>Cash</span>
+                <strong id="portfolioCash">1.000 €</strong>
+            </div>
+
+            <div class="portfolio-row">
+                <span>BTC</span>
+                <strong id="portfolioBTC">0</strong>
+            </div>
+
+            <div class="portfolio-row">
+                <span>ETH</span>
+                <strong id="portfolioETH">0</strong>
+            </div>
+
+            <div class="portfolio-row">
+                <span>SOL</span>
+                <strong id="portfolioSOL">0</strong>
+            </div>
+
+            <div class="portfolio-row">
+                <span>Gesamtwert</span>
+                <strong id="portfolioTotal">1.000 €</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>🎓 Trading lernen</h2>
+
+        <div class="lesson">
+            <strong>Lektion 1 – Was ist Trading?</strong>
+            <p>
+                Trading bedeutet, einen Vermögenswert zu kaufen und später
+                zu einem anderen Preis zu verkaufen.
+            </p>
+        </div>
+
+        <div class="lesson">
+            <strong>Lektion 2 – Risiko</strong>
+            <p>
+                Kurse können steigen oder fallen. Deshalb sollte man nie
+                blind sein gesamtes Kapital einsetzen.
+            </p>
+        </div>
+
+        <div class="lesson">
+            <strong>Lektion 3 – Üben</strong>
+            <p>
+                Nutze das virtuelle Startkapital von 1.000 € und sammle
+                Erfahrung, ohne echtes Geld zu riskieren.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    TradeQuest ist eine Lernsimulation. Kein echtes Geld und keine Anlageberatung.
+</footer>
+
+<script>
+
+const API =
+"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=eur";
+
+let state = JSON.parse(localStorage.getItem("tradequest")) || {
+
+    cash: 1000,
+
+    portfolio: {
+        BTC: 0,
+        ETH: 0,
+        SOL: 0
+    },
+
+    xp: 0,
+
+    history: []
+
+};
+
+let prices = {
+    BTC: 0,
+    ETH: 0,
+    SOL: 0
+};
+
+let selected = "BTC";
+
+let chartData = [];
+
+function save() {
+
+    localStorage.setItem(
+        "tradequest",
+        JSON.stringify(state)
+    );
+
+}
+
+function formatEuro(value) {
+
+    return new Intl.NumberFormat(
+        "de-DE",
+        {
+            style: "currency",
+            currency: "EUR"
+        }
+    ).format(value);
+
+}
+
+function selectAsset(asset) {
+
+    selected = asset;
+
+    document.getElementById("coinSelect").value = asset;
+
+    document.querySelectorAll(".asset")
+        .forEach(x => x.classList.remove("active"));
+
+    const cards = document.querySelectorAll(".asset");
+
+    if(asset === "BTC") cards[0].classList.add("active");
+    if(asset === "ETH") cards[1].classList.add("active");
+    if(asset === "SOL") cards[2].classList.add("active");
+
+    document.getElementById("chartTitle").innerText =
+        asset === "BTC"
+        ? "Bitcoin (BTC)"
+        : asset === "ETH"
+        ? "Ethereum (ETH)"
+        : "Solana (SOL)";
+
+    chartData = [];
+
+    drawChart();
+
+}
+
+async function updatePrices() {
+
+    try {
+
+        const response = await fetch(API);
+
+        const data = await response.json();
+
+        prices.BTC = data.bitcoin.eur;
+        prices.ETH = data.ethereum.eur;
+        prices.SOL = data.solana.eur;
+
+        document.getElementById("BTCprice").innerText =
+            formatEuro(prices.BTC);
+
+        document.getElementById("ETHprice").innerText =
+            formatEuro(prices.ETH);
+
+        document.getElementById("SOLprice").innerText =
+            formatEuro(prices.SOL);
+
+        chartData.push(prices[selected]);
+
+        if(chartData.length > 30)
+            chartData.shift();
+
+        drawChart();
+
+        updatePortfolio();
+
+    } catch(error) {
+
+        console.log("Kurs konnte nicht geladen werden.");
+
+    }
+
+}
+
+function buy() {
+
+    const amount =
+        Number(document.getElementById("amount").value);
+
+    if(!amount || amount <= 0) {
+
+        alert("Bitte einen Betrag eingeben.");
+
+        return;
+
+    }
+
+    if(amount > state.cash) {
+
+        alert("Du hast nicht genug Spielgeld.");
+
+        return;
+
+    }
+
+    const coinAmount =
+        amount / prices[selected];
+
+    state.cash -= amount;
+
+    state.portfolio[selected] += coinAmount;
+
+    state.xp += 10;
+
+    state.history.push({
+
+        type: "BUY",
+        coin: selected,
+        amount: amount,
+        price: prices[selected],
+        date: new Date().toLocaleString()
+
+    });
+
+    save();
+
+    updatePortfolio();
+
+    alert(
+        "Kauf erfolgreich! +" +
+        "10 XP"
+    );
+
+}
+
+function sell() {
+
+    const amount =
+        Number(document.getElementById("amount").value);
+
+    if(!amount || amount <= 0) {
+
+        alert("Bitte einen Betrag eingeben.");
+
+        return;
+
+    }
+
+    const coinAmount =
+        amount / prices[selected];
+
+    if(coinAmount > state.portfolio[selected]) {
+
+        alert("Du besitzt nicht genug " + selected);
+
+        return;
+
+    }
+
+    state.portfolio[selected] -= coinAmount;
+
+    state.cash += amount;
+
+    state.xp += 15;
+
+    state.history.push({
+
+        type: "SELL",
+        coin: selected,
+        amount: amount,
+        price: prices[selected],
+        date: new Date().toLocaleString()
+
+    });
+
+    save();
+
+    updatePortfolio();
+
+    alert(
+        "Verkauf erfolgreich! +" +
+        "15 XP"
+    );
+
+}
+
+function updatePortfolio() {
+
+    document.getElementById("cash").innerText =
+        formatEuro(state.cash);
+
+    document.getElementById("portfolioCash").innerText =
+        formatEuro(state.cash);
+
+    document.getElementById("portfolioBTC").innerText =
+        state.portfolio.BTC.toFixed(6);
+
+    document.getElementById("portfolioETH").innerText =
+        state.portfolio.ETH.toFixed(6);
+
+    document.getElementById("portfolioSOL").innerText =
+        state.portfolio.SOL.toFixed(6);
+
+    const total =
+
+        state.cash +
+
+        state.portfolio.BTC * prices.BTC +
+
+        state.portfolio.ETH * prices.ETH +
+
+        state.portfolio.SOL * prices.SOL;
+
+    document.getElementById("portfolioTotal").innerText =
+        formatEuro(total);
+
+    updateLevel();
+
+}
+
+function updateLevel() {
+
+    const level =
+        Math.floor(state.xp / 100) + 1;
+
+    const currentXP =
+        state.xp % 100;
+
+    document.getElementById("level").innerText =
+        level;
+
+    document.getElementById("xp").innerText =
+        state.xp;
+
+    document.getElementById("xpFill").style.width =
+        currentXP + "%";
+
+}
+
+function drawChart() {
+
+    const canvas =
+        document.getElementById("chart");
+
+    const ctx =
+        canvas.getContext("2d");
+
+    const width =
+        canvas.clientWidth;
+
+    const height =
+        canvas.clientHeight;
+
+    canvas.width = width * devicePixelRatio;
+    canvas.height = height * devicePixelRatio;
+
+    ctx.scale(
+        devicePixelRatio,
+        devicePixelRatio
+    );
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    if(chartData.length < 2)
+        return;
+
+    const min =
+        Math.min(...chartData);
+
+    const max =
+        Math.max(...chartData);
+
+    const range =
+        max - min || 1;
+
+    ctx.beginPath();
+
+    chartData.forEach((value,index) => {
+
+        const x =
+            (index /
+            (chartData.length - 1))
+            * width;
+
+        const y =
+            height -
+            ((value - min) / range)
+            * (height - 20) -
+            10;
+
+        if(index === 0)
+            ctx.moveTo(x,y);
+        else
+            ctx.lineTo(x,y);
+
+    });
+
+    ctx.strokeStyle =
+        "#00d084";
+
+    ctx.lineWidth = 3;
+
+    ctx.stroke();
+
+}
+
+updatePrices();
+
+setInterval(
+    updatePrices,
+    30000
+);
+
+updatePortfolio();
+
+</script>
+
+</body>
+</html>
