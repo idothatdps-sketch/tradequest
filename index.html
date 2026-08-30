@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#080b12">
+
+<title>TradeQuest – Trading lernen</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:#070a10;
+color:#fff;
+}
+
+header{
+position:sticky;
+top:0;
+z-index:20;
+background:#0d121c;
+border-bottom:1px solid #20293a;
+padding:15px;
+}
+
+.nav{
+max-width:1100px;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.logo{
+font-size:23px;
+font-weight:800;
+}
+
+.logo span{
+color:#00d084;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+padding:16px;
+}
+
+.card{
+background:#0e141f;
+border:1px solid #20293a;
+border-radius:18px;
+padding:18px;
+margin-bottom:16px;
+}
+
+.hero{
+background:linear-gradient(135deg,#101a2a,#0d111a);
+}
+
+.small{
+font-size:13px;
+color:#8c98aa;
+}
+
+.big{
+font-size:34px;
+font-weight:800;
+margin:6px 0 12px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+}
+
+.asset{
+background:#111927;
+border:1px solid #202b3e;
+border-radius:15px;
+padding:15px;
+cursor:pointer;
+}
+
+.asset.active{
+border-color:#00d084;
+}
+
+.asset-name{
+font-weight:700;
+}
+
+.asset-symbol{
+font-size:12px;
+color:#8490a2;
+margin-top:3px;
+}
+
+.price{
+font-size:20px;
+font-weight:800;
+margin-top:12px;
+}
+
+.live{
+font-size:12px;
+color:#00d084;
+margin-top:4px;
+}
+
+.chartbox{
+height:310px;
+background:#090e17;
+border-radius:14px;
+padding:8px;
+}
+
+canvas{
+width:100%;
+height:100%;
+display:block;
+}
+
+.tradegrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+}
+
+label{
+font-size:13px;
+color:#9aa5b5;
+}
+
+input,select{
+width:100%;
+padding:13px;
+margin-top:6px;
+margin-bottom:13px;
+border-radius:10px;
+border:1px solid #29354a;
+background:#080c14;
+color:white;
+font-size:15px;
+}
+
+button{
+width:100%;
+padding:13px;
+border:0;
+border-radius:10px;
+font-weight:800;
+cursor:pointer;
+}
+
+.buy{
+background:#00d084;
+color:#03130d;
+}
+
+.sell{
+background:#ff4f70;
+color:white;
+}
+
+.secondary{
+background:#192232;
+color:white;
+}
+
+.tabs{
+display:flex;
+gap:8px;
+overflow:auto;
+margin-bottom:15px;
+}
+
+.tab{
+white-space:nowrap;
+padding:9px 13px;
+border-radius:9px;
+background:#151e2c;
+color:#aab5c5;
+cursor:pointer;
+}
+
+.tab.active{
+background:#00d084;
+color:#03130d;
+font-weight:800;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+gap:10px;
+padding:12px 0;
+border-bottom:1px solid #20293a;
+}
+
+.row:last-child{
+border-bottom:0;
+}
+
+.green{
+color:#00d084;
+}
+
+.red{
+color:#ff4f70;
+}
+
+.xpbar{
+height:9px;
+background:#20293a;
+border-radius:20px;
+overflow:hidden;
+margin-top:9px;
+}
+
+.xpfill{
+height:100%;
+width:0%;
+background:#00d084;
+transition:.3s;
+}
+
+.lesson{
+background:#0a101a;
+border:1px solid #1e2939;
+border-radius:13px;
+padding:15px;
+margin-top:10px;
+}
+
+.lesson button{
+margin-top:10px;
+}
+
+.quiz-option{
+background:#151e2c;
+color:white;
+margin-top:8px;
+text-align:left;
+}
+
+.quiz-option.correct{
+background:#00d084;
+color:#03130d;
+}
+
+.quiz-option.wrong{
+background:#ff4f70;
+}
+
+.history{
+font-size:13px;
+}
+
+.history-item{
+padding:12px 0;
+border-bottom:1px solid #20293a;
+}
+
+.empty{
+color:#7f8b9d;
+text-align:center;
+padding:20px;
+}
+
+footer{
+text-align:center;
+color:#69758a;
+font-size:12px;
+padding:30px 10px;
+}
+
+@media(max-width:700px){
+
+.grid{
+grid-template-columns:1fr;
+}
+
+.tradegrid{
+grid-template-columns:1fr;
+}
+
+.chartbox{
+height:250px;
+}
+
+.big{
+font-size:30px;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="nav">
+<div class="logo">Trade<span>Quest</span> 📈</div>
+<div class="small">Trading Simulator</div>
+</div>
+</header>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+
+<div class="card hero">
+
+<div class="small">Portfolio-Wert</div>
+
+<div class="big" id="totalValue">1.000,00 €</div>
+
+<div class="row">
+<span>Spielgeld</span>
+<strong id="cash">1.000,00 €</strong>
+</div>
+
+<div class="row">
+<span>Gewinn / Verlust</span>
+<strong id="profit">0,00 €</strong>
+</div>
+
+<div class="row">
+<span>Performance</span>
+<strong id="performance">0,00 %</strong>
+</div>
+
+<br>
+
+<strong>
+Level <span id="level">1</span>
+· <span id="xpText">0 XP</span>
+</strong>
+
+<div class="xpbar">
+<div class="xpfill" id="xpFill"></div>
+</div>
+
+</div>
+
+<!-- COINS -->
+
+<div class="grid">
+
+<div class="asset active" onclick="selectCoin('BTC')">
+<div class="asset-name">Bitcoin</div>
+<div class="asset-symbol">BTC</div>
+<div class="price" id="BTCprice">Laden...</div>
+<div class="live">● LIVE</div>
+</div>
+
+<div class="asset" onclick="selectCoin('ETH')">
+<div class="asset-name">Ethereum</div>
+<div class="asset-symbol">ETH</div>
+<div class="price" id="ETHprice">Laden...</div>
+<div class="live">● LIVE</div>
+</div>
+
+<div class="asset" onclick="selectCoin('SOL')">
+<div class="asset-name">Solana</div>
+<div class="asset-symbol">SOL</div>
+<div class="price" id="SOLprice">Laden...</div>
+<div class="live">● LIVE</div>
+</div>
+
+</div>
+
+<br>
+
+<!-- CHART -->
+
+<div class="card">
+
+<div class="row">
+<strong id="chartTitle">Bitcoin</strong>
+<span class="small" id="currentPrice">Laden...</span>
+</div>
+
+<div class="tabs">
+<div class="tab active" onclick="setChartPoints(20,this)">LIVE</div>
+<div class="tab" onclick="setChartPoints(40,this)">VERLAUF</div>
+</div>
+
+<div class="chartbox">
+<canvas id="chart"></canvas>
+</div>
+
+</div>
+
+<!-- TRADING -->
+
+<div class="tradegrid">
+
+<div class="card">
+
+<h2>Trade</h2>
+
+<label>Asset</label>
+
+<select id="coinSelect" onchange="selectCoin(this.value)">
+
+<option value="BTC">Bitcoin (BTC)</option>
+<option value="ETH">Ethereum (ETH)</option>
+<option value="SOL">Solana (SOL)</option>
+
+</select>
+
+<label>Betrag (€)</label>
+
+<input
+id="tradeAmount"
+type="number"
+min="1"
+step="1"
+placeholder="z.B. 100"
+>
+
+<button class="buy" onclick="buy()">KAUFEN</button>
+
+<br><br>
+
+<button class="sell" onclick="sell()">VERKAUFEN</button>
+
+</div>
+
+<!-- PORTFOLIO -->
+
+<div class="card">
+
+<h2>Portfolio</h2>
+
+<div class="row">
+<span>BTC</span>
+<strong id="btcHolding">0</strong>
+</div>
+
+<div class="row">
+<span>ETH</span>
+<strong id="ethHolding">0</strong>
+</div>
+
+<div class="row">
+<span>SOL</span>
+<strong id="solHolding">0</strong>
+</div>
+
+<div class="row">
+<span>Investiert</span>
+<strong id="invested">0,00 €</strong>
+</div>
+
+</div>
+
+</div>
+
+<!-- MISSIONS -->
+
+<div class="card">
+
+<h2>🎯 Missionen</h2>
+
+<div class="lesson">
+
+<strong>Mission 1</strong>
+
+<p>
+Führe deinen ersten virtuellen Trade durch.
+</p>
+
+<span id="mission1">0 / 1</span>
+
+</div>
+
+<div class="lesson">
+
+<strong>Mission 2</strong>
+
+<p>
+Sammle mindestens 50 XP.
+</p>
+
+<span id="mission2">0 / 50 XP</span>
+
+</div>
+
+<div class="lesson">
+
+<strong>Mission 3</strong>
+
+<p>
+Lerne deine erste Trading-Lektion.
+</p>
+
+<span id="mission3">Noch nicht abgeschlossen</span>
+
+</div>
+
+</div>
+
+<!-- ACADEMY -->
+
+<div class="card">
+
+<h2>🎓 Trading Academy</h2>
+
+<div class="lesson">
+
+<strong>Lektion 1 – Was ist Trading?</strong>
+
+<p>
+Trading bedeutet, einen Vermögenswert zu kaufen oder zu verkaufen,
+um von Preisbewegungen zu profitieren.
+</p>
+
+<button class="secondary" onclick="startQuiz()">
+Quiz starten
+</button>
+
+</div>
+
+<div id="quiz"></div>
+
+<div class="lesson">
+
+<strong>Lektion 2 – Risiko</strong>
+
+<p>
+Preise können steigen und fallen. Deshalb ist Risikomanagement
+ein wichtiger Bestandteil des Tradings.
+</p>
+
+</div>
+
+<div class="lesson">
+
+<strong>Lektion 3 – Diversifikation</strong>
+
+<p>
+Nicht alles auf einen einzigen Vermögenswert zu setzen kann
+dabei helfen, Risiken zu verteilen.
+</p>
+
+</div>
+
+</div>
+
+<!-- HISTORY -->
+
+<div class="card">
+
+<h2>📜 Trade-Historie</h2>
+
+<div id="history" class="history"></div>
+
+</div>
+
+<div class="card">
+
+<h2>⚙️ Spiel</h2>
+
+<button class="secondary" onclick="resetGame()">
+Spielstand zurücksetzen
+</button>
+
+</div>
+
+</div>
+
+<footer>
+
+TradeQuest ist eine Lern- und Trading-Simulation.
+Alle Beträge sind virtuelles Spielgeld.
+Keine Anlageberatung.
+
+</footer>
+
+<script>
+
+const API =
+"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=eur";
+
+const STARTING_CASH = 1000;
+
+let state =
+JSON.parse(localStorage.getItem("tradequestV2")) || {
+
+cash: STARTING_CASH,
+
+portfolio:{
+BTC:0,
+ETH:0,
+SOL:0
+},
+
+invested:0,
+
+xp:0,
+
+trades:[],
+
+lessons:0
+
+};
+
+let prices={
+BTC:0,
+ETH:0,
+SOL:0
+};
+
+let selected="BTC";
+
+let chartData=[];
+
+let maxPoints=20;
+
+function save(){
+
+localStorage.setItem(
+"tradequestV2",
+JSON.stringify(state)
+);
+
+}
+
+function euro(value){
+
+return new Intl.NumberFormat(
+"de-DE",
+{
+style:"currency",
+currency:"EUR"
+}
+).format(value);
+
+}
+
+function number(value){
+
+return new Intl.NumberFormat(
+"de-DE",
+{
+maximumFractionDigits:6
+}
+).format(value);
+
+}
+
+function selectCoin(coin){
+
+selected=coin;
+
+document.getElementById(
+"coinSelect"
+).value=coin;
+
+document.querySelectorAll(".asset")
+.forEach(x=>x.classList.remove("active"));
+
+if(coin==="BTC")
+document.querySelectorAll(".asset")[0]
+.classList.add("active");
+
+if(coin==="ETH")
+document.querySelectorAll(".asset")[1]
+.classList.add("active");
+
+if(coin==="SOL")
+document.querySelectorAll(".asset")[2]
+.classList.add("active");
+
+document.getElementById(
+"chartTitle"
+).innerText =
+coin==="BTC"
+?"Bitcoin (BTC)"
+:coin==="ETH"
+?"Ethereum (ETH)"
+:"Solana (SOL)";
+
+chartData=[];
+
+drawChart();
+
+}
+
+async function updatePrices(){
+
+try{
+
+const response=await fetch(API);
+
+const data=await response.json();
+
+prices.BTC=data.bitcoin.eur;
+prices.ETH=data.ethereum.eur;
+prices.SOL=data.solana.eur;
+
+document.getElementById(
+"BTCprice"
+).innerText=euro(prices.BTC);
+
+document.getElementById(
+"ETHprice"
+).innerText=euro(prices.ETH);
+
+document.getElementById(
+"SOLprice"
+).innerText=euro(prices.SOL);
+
+document.getElementById(
+"currentPrice"
+).innerText=euro(prices[selected]);
+
+chartData.push(prices[selected]);
+
+if(chartData.length>maxPoints)
+chartData.shift();
+
+drawChart();
+
+updateUI();
+
+}catch(error){
+
+console.log("Kurs konnte nicht geladen werden.");
+
+}
+
+}
+
+function buy(){
+
+const amount=
+Number(
+document.getElementById("tradeAmount").value
+);
+
+if(!amount||amount<=0){
+
+alert("Bitte einen gültigen Betrag eingeben.");
+
+return;
+
+}
+
+if(amount>state.cash){
+
+alert("Du hast nicht genug Spielgeld.");
+
+return;
+
+}
+
+if(!prices[selected]){
+
+alert("Der aktuelle Kurs ist noch nicht geladen.");
+
+return;
+
+}
+
+const quantity=
+amount/prices[selected];
+
+state.cash-=amount;
+
+state.portfolio[selected]+=quantity;
+
+state.invested+=amount;
+
+state.xp+=10;
+
+state.trades.unshift({
+
+type:"BUY",
+
+coin:selected,
+
+amount:amount,
+
+quantity:quantity,
+
+price:prices[selected],
+
+date:new Date().toLocaleString("de-DE")
+
+});
+
+save();
+
+updateUI();
+
+document.getElementById(
+"tradeAmount"
+).value="";
+
+alert(
+"Kauf erfolgreich!\n\n"+
+"+"+euro(amount)+
+"\n+"+number(quantity)+" "+selected+
+"\n+10 XP"
+);
+
+}
+
+function sell(){
+
+const amount=
+Number(
+document.getElementById("tradeAmount").value
+);
+
+if(!amount||amount<=0){
+
+alert("Bitte einen gültigen Betrag eingeben.");
+
+return;
+
+}
+
+if(!prices[selected]){
+
+alert("Der aktuelle Kurs ist noch nicht geladen.");
+
+return;
+
+}
+
+const quantity=
+amount/prices[selected];
+
+if(quantity>state.portfolio[selected]){
+
+alert(
+"Du besitzt nicht genug "+
+selected+" für diesen Verkauf."
+);
+
+return;
+
+}
+
+state.portfolio[selected]-=quantity;
+
+state.cash+=amount;
+
+state.xp+=15;
+
+state.trades.unshift({
+
+type:"SELL",
+
+coin:selected,
+
+amount:amount,
+
+quantity:quantity,
+
+price:prices[selected],
+
+date:new Date().toLocaleString("de-DE")
+
+});
+
+save();
+
+updateUI();
+
+document.getElementById(
+"tradeAmount"
+).value="";
+
+alert(
+"Verkauf erfolgreich!\n\n"+
+euro(amount)+
+"\n-"+number(quantity)+" "+selected+
+"\n+15 XP"
+);
+
+}
+
+function updateUI(){
+
+const cryptoValue=
+
+state.portfolio.BTC*prices.BTC+
+state.portfolio.ETH*prices.ETH+
+state.portfolio.SOL*prices.SOL;
+
+const total=
+state.cash+cryptoValue;
+
+const profit=
+total-STARTING_CASH;
+
+const performance=
+(profit/STARTING_CASH)*100;
+
+document.getElementById(
+"totalValue"
+).innerText=euro(total);
+
+document.getElementById(
+"cash"
+).innerText=euro(state.cash);
+
+document.getElementById(
+"profit"
+).innerText=euro(profit);
+
+document.getElementById(
+"performance"
+).innerText=
+performance.toFixed(2)+" %";
+
+document.getElementById(
+"profit"
+).className=
+profit>=0?"green":"red";
+
+document.getElementById(
+"performance"
+).className=
+performance>=0?"green":"red";
+
+document.getElementById(
+"btcHolding"
+).innerText=
+number(state.portfolio.BTC);
+
+document.getElementById(
+"ethHolding"
+).innerText=
+number(state.portfolio.ETH);
+
+document.getElementById(
+"solHolding"
+).innerText=
+number(state.portfolio.SOL);
+
+document.getElementById(
+"invested"
+).innerText=
+euro(state.invested);
+
+updateLevel();
+
+updateMissions();
+
+renderHistory();
+
+}
+
+function updateLevel(){
+
+const level=
+Math.floor(state.xp/100)+1;
+
+const currentXP=
+state.xp%100;
+
+document.getElementById(
+"level"
+).innerText=level;
+
+document.getElementById(
+"xpText"
+).innerText=state.xp+" XP";
+
+document.getElementById(
+"xpFill"
+).style.width=
+currentXP+"%";
+
+}
+
+function updateMissions(){
+
+document.getElementById(
+"mission1"
+).innerText=
+state.trades.length>0
+?"1 / 1"
+:"0 / 1";
+
+document.getElementById(
+"mission2"
+).innerText=
+Math.min(state.xp,50)+" / 50 XP";
+
+document.getElementById(
+"mission3"
+).innerText=
+state.lessons>0
+?"Abgeschlossen ✅"
+:"Noch nicht abgeschlossen";
+
+}
+
+function renderHistory(){
+
+const box=
+document.getElementById("history");
+
+if(state.trades.length===0){
+
+box.innerHTML=
+'<div class="empty">Noch keine Trades.</div>';
+
+return;
+
+}
+
+box.innerHTML=
+state.trades.slice(0,20)
+.map(t=>{
+
+const sign=
+t.type==="BUY"?"🟢":"🔴";
+
+const word=
+t.type==="BUY"?"KAUF":"VERKAUF";
+
+return`
+
+<div class="history-item">
+
+<strong>${sign} ${word} ${t.coin}</strong>
+
+<br>
+
+${euro(t.amount)}
+· ${number(t.quantity)} ${t.coin}
+
+<br>
+
+<span class="small">
+Kurs: ${euro(t.price)}
+<br>
+${t.date}
+</span>
+
+</div>
+
+`;
+
+})
+.join("");
+
+}
+
+function setChartPoints(points,element){
+
+maxPoints=points;
+
+document.querySelectorAll(".tab")
+.forEach(x=>x.classList.remove("active"));
+
+element.classList.add("active");
+
+if(chartData.length>points)
+chartData=chartData.slice(-points);
+
+drawChart();
+
+}
+
+function drawChart(){
+
+const canvas=
+document.getElementById("chart");
+
+const ctx=
+canvas.getContext("2d");
+
+const width=
+canvas.clientWidth;
+
+const height=
+canvas.clientHeight;
+
+const ratio=
+window.devicePixelRatio||1;
+
+canvas.width=
+width*ratio;
+
+canvas.height=
+height*ratio;
+
+ctx.setTransform(
+ratio,0,0,ratio,0,0
+);
+
+ctx.clearRect(
+0,0,width,height
+);
+
+if(chartData.length<2)
+return;
+
+const min=
+Math.min(...chartData);
+
+const max=
+Math.max(...chartData);
+
+const range=
+max-min||1;
+
+ctx.beginPath();
+
+chartData.forEach((value,index)=>{
+
+const x=
+(index/(chartData.length-1))*width;
+
+const y=
+height-
+((value-min)/range)*(height-25)
+-10;
+
+if(index===0)
+ctx.moveTo(x,y);
+else
+ctx.lineTo(x,y);
+
+});
+
+ctx.lineWidth=3;
+
+ctx.strokeStyle="#00d084";
+
+ctx.stroke();
+
+}
+
+function startQuiz(){
+
+const quiz=
+document.getElementById("quiz");
+
+quiz.innerHTML=`
+
+<div class="lesson">
+
+<strong>Quiz: Was ist beim Trading wichtig?</strong>
+
+<button class="quiz-option"
+onclick="answerQuiz(this,false)">
+A) Immer alles investieren
+</button>
+
+<button class="quiz-option"
+onclick="answerQuiz(this,true)">
+B) Risiko verstehen und kontrollieren
+</button>
+
+<button class="quiz-option"
+onclick="answerQuiz(this,false)">
+C) Nur kaufen, weil der Kurs steigt
+</button>
+
+</div>
+
+`;
+
+}
+
+function answerQuiz(button,correct){
+
+const buttons=
+document.querySelectorAll(".quiz-option");
+
+buttons.forEach(b=>b.disabled=true);
+
+if(correct){
+
+button.classList.add("correct");
+
+state.xp+=25;
+
+state.lessons=1;
+
+save();
+
+updateUI();
+
+setTimeout(()=>{
+
+alert(
+"Richtig! 🎉\n\n"+
+"+25 XP"
+);
+
+},100);
+
+}else{
+
+button.classList.add("wrong");
+
+setTimeout(()=>{
+
+alert(
+"Nicht ganz. Lies die Lektion noch einmal."
+);
+
+},100);
+
+}
+
+}
+
+function resetGame(){
+
+const confirmReset=
+confirm(
+"Willst du deinen kompletten Spielstand löschen?"
+);
+
+if(!confirmReset)
+return;
+
+state={
+
+cash:STARTING_CASH,
+
+portfolio:{
+BTC:0,
+ETH:0,
+SOL:0
+},
+
+invested:0,
+
+xp:0,
+
+trades:[],
+
+lessons:0
+
+};
+
+save();
+
+updateUI();
+
+alert("Spielstand wurde zurückgesetzt.");
+
+}
+
+window.addEventListener(
+"resize",
+drawChart
+);
+
+updatePrices();
+
+updateUI();
+
+setInterval(
+updatePrices,
+30000
+);
+
+</script>
+
+</body>
+</html>
