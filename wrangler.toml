@@ -1,0 +1,15 @@
+name = "tradequest-market-proxy"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+
+[env.production]
+routes = [
+  { pattern = "api.tradequest.example.com/*", zone_name = "example.com" }
+]
+
+[build]
+command = "npm install"
+cwd = "."
+
+[[env.production.triggers.crons]]
+cron = "*/30 * * * *"
